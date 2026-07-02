@@ -1,4 +1,5 @@
 const { getSlackClient, getBotUserId } = require("./slackClient");
+const { buildFileContentBlocks } = require("./fileReader");
 
 const MAX_MESSAGES = 12;
 
@@ -42,7 +43,23 @@ async function buildMessages(event) {
   }
 
   while (messages.length && messages[0].role === "assistant") messages.shift();
-  return collapse(messages);
+  const collapsed = collapse(messages);
+
+  if (event.files && event.files.length) {
+    const fileBlocks = await buildFileContentBlocks(
+      event.files,
+      process.env.SLACK_BOT_TOKEN
+    );
+    const finalUser = [...collapsed].reverse().find((message) => message.role === "user");
+    if (finalUser && fileBlocks.length) {
+      finalUser.content = [
+        { type: "text", text: String(finalUser.content || "첨부파일을 분석해 주세요.") },
+        ...fileBlocks
+      ];
+    }
+  }
+
+  return collapsed;
 }
 
 function collapse(messages) {

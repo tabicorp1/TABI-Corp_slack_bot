@@ -3,6 +3,7 @@ const assert = require("node:assert/strict");
 const crypto = require("crypto");
 
 const { collapse } = require("../lib/context");
+const { fileKind } = require("../lib/fileReader");
 const { matchRole } = require("../lib/personaResolver");
 const { verifySlackSignature } = require("../lib/slackVerify");
 
@@ -39,4 +40,12 @@ test("Slack 서명을 검증한다", () => {
 
   assert.equal(verifySlackSignature(secret, signature, timestamp, body), true);
   assert.equal(verifySlackSignature(secret, "v0=wrong", timestamp, body), false);
+});
+
+test("지원하는 파일 형식을 구분한다", () => {
+  assert.equal(fileKind("application/pdf"), "pdf");
+  assert.equal(fileKind("image/png"), "image");
+  assert.equal(fileKind("text/csv"), "text");
+  assert.equal(fileKind("application/json"), "text");
+  assert.equal(fileKind("application/zip"), "unsupported");
 });

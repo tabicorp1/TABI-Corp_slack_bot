@@ -38,7 +38,8 @@ exports.slackEvents = onRequest(
     }
 
     const event = body.event;
-    if (!event || event.type !== "message" || event.subtype || event.bot_id) {
+    const supportedSubtype = !event?.subtype || event.subtype === "file_share";
+    if (!event || event.type !== "message" || !supportedSubtype || event.bot_id) {
       return res.status(200).send("ignored");
     }
 

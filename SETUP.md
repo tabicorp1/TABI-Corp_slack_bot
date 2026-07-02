@@ -20,6 +20,7 @@ chat:write
 chat:write.customize
 channels:history
 channels:read
+files:read
 ```
 
 비공개 채널도 사용하려면 `groups:history`, `groups:read`를 추가합니다.
@@ -73,3 +74,13 @@ firebase functions:log
 ```
 
 Claude 호출마다 API 비용이 발생합니다. 기본 모델은 `claude-opus-4-8`이며 `functions/lib/anthropicClient.js`에서 변경할 수 있습니다.
+
+## 파일 읽기
+
+봇이 초대된 채널에 파일을 올리고 질문을 함께 적으면 파일 내용을 Claude에게 전달합니다.
+
+- 지원: PDF, PNG/JPEG/GIF/WebP 이미지, TXT, CSV, JSON, XML
+- 제한: 메시지당 최대 5개, 파일당 최대 10MB
+- 미지원: Word, Excel, PowerPoint, ZIP 및 동영상
+
+파일 다운로드를 위해 Slack 앱의 Bot Token Scope에 `files:read`가 반드시 필요합니다. 권한을 추가한 뒤 앱을 워크스페이스에 다시 설치해야 합니다.
