@@ -4,6 +4,7 @@ const crypto = require("crypto");
 
 const { collapse } = require("../lib/context");
 const { fileKind } = require("../lib/fileReader");
+const { extractText, MAX_TOKENS } = require("../lib/anthropicClient");
 const { matchRole } = require("../lib/personaResolver");
 const { verifySlackSignature } = require("../lib/slackVerify");
 
@@ -48,4 +49,17 @@ test("지원하는 파일 형식을 구분한다", () => {
   assert.equal(fileKind("text/csv"), "text");
   assert.equal(fileKind("application/json"), "text");
   assert.equal(fileKind("application/zip"), "unsupported");
+});
+
+test("긴 답변을 위한 출력 한도와 Claude 텍스트 추출을 사용한다", () => {
+  assert.equal(MAX_TOKENS, 4096);
+  assert.equal(
+    extractText({
+      content: [
+        { type: "text", text: "첫 문장" },
+        { type: "text", text: "과 두 번째 문장" }
+      ]
+    }),
+    "첫 문장과 두 번째 문장"
+  );
 });
